@@ -1,3 +1,10 @@
+<!--
+ * @description: 
+ * @author: xiejiaxin
+ * @e-mail: xiejx@glodon.com
+ * @Date: 2021-12-09 17:47:30
+ * @desc: 
+-->
 <template>
   <label
     class="el-checkbox"
@@ -54,6 +61,7 @@
   </label>
 </template>
 <script>
+/*eslint-disable */
   import Emitter from 'element-ui/src/mixins/emitter';
 
   export default {

@@ -154,6 +154,10 @@
               "title": "Table 表格"
             },
             {
+              "path": "/table-learn",
+              "title": "Table 表格学习"
+            },
+            {
               "path": "/tag",
               "title": "Tag 标签"
             },
@@ -450,6 +454,10 @@
             {
               "path": "/table",
               "title": "Table"
+            },
+            {
+              "path": "/table-learn",
+              "title": "Table 表格学习"
             },
             {
               "path": "/tag",

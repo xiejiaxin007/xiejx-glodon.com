@@ -24,6 +24,7 @@
   "button": "./packages/button/index.js",
   "button-group": "./packages/button-group/index.js",
   "table": "./packages/table/index.js",
+  "table-learn": "./packages/table-learn/index.js",
   "table-column": "./packages/table-column/index.js",
   "date-picker": "./packages/date-picker/index.js",
   "time-select": "./packages/time-select/index.js",
