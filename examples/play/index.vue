@@ -10,37 +10,42 @@
     <el-table-learn
     :data="tableData"
     style="width: 100%"
-    height="250">
+    height="550">
       <el-table-column
-        fixed
-        prop="date"
-        label="日期"
-        width="150">
+        type="index"
+        width="50">
       </el-table-column>
       <el-table-column
-        prop="name"
-        label="姓名"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="province"
-        label="省份"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="city"
-        label="市区"
-        width="120">
-      </el-table-column>
-      <el-table-column
-        prop="address"
-        label="地址"
-        width="300">
-      </el-table-column>
-      <el-table-column
-        prop="zip"
-        label="邮编"
-        width="120">
+        v-for="item in tbLabel"
+        :key="item.prop"
+        :prop="item.prop"
+        :label="item.name">
+        <template slot-scope="scope">
+          <el-input v-if="item.prop === 'address' || item.prop === 'name' || item.prop === 'zip' || item.prop === 'age'" v-model="scope.row[item.prop]" />
+          <el-select v-else-if="item.prop === 'city'" v-model="scope.row[item.prop]" placeholder="请选择">
+            <el-option
+              v-for="item in options"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <el-select v-else-if="item.prop === 'sex'" v-model="scope.row[item.prop]" placeholder="请选择">
+            <el-option
+              v-for="item in sexOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value">
+            </el-option>
+          </el-select>
+          <el-date-picker
+            v-else-if="item.prop === 'date'"
+            v-model="scope.row[item.prop]"
+            type="date"
+            placeholder="选择日期">
+          </el-date-picker>
+          <span v-else>{{scope.row[item.prop]}}</span>
+        </template>
       </el-table-column>
     </el-table-learn>
   </div>
@@ -48,63 +53,83 @@
 
 <script>
   import {mockData} from './mock';
+  // 表头
+  const tbLabel = [
+    {
+      prop: 'date',
+      name: '日期'
+    },
+    {
+      prop: 'name',
+      name: '姓名'
+    },
+    {
+      prop: 'city',
+      name: '城市'
+    },
+    {
+      prop: 'address',
+      name: '地址'
+    },
+    {
+      prop: 'zip',
+      name: '邮政编码'
+    },
+    {
+      prop: 'sex',
+      name: '性别'
+    },
+    {
+      prop: 'age',
+      name: '年龄'
+    }
+  ]
   export default {
     data() {
       return {
-        tableData: [{
-          date: '2016-05-03',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }, {
-          date: '2016-05-02',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }, {
-          date: '2016-05-08',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }, {
-          date: '2016-05-06',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }, {
-          date: '2016-05-07',
-          name: '王小虎',
-          province: '上海',
-          city: '普陀区',
-          address: '上海市普陀区金沙江路 1518 弄',
-          zip: 200333
-        }]
+        tableData: mockData,
+        tbLabel: tbLabel,
+        form: {
+          date: '',
+          name: '',
+          city: '',
+          address: '',
+          zip: ''
+        },
+        sexOptions: [
+          {
+            label: '男',
+            value: '1'
+          },
+          {
+            label: '女',
+            value: '2'
+          }
+        ],
+        options: [
+          {
+            label: '普陀区',
+            value: '1'
+          },
+          {
+            label: '普陀区2',
+            value: '2'
+          },
+          {
+            label: '普陀区3',
+            value: '3'
+          },
+          {
+            label: '普陀区4',
+            value: '4'
+          },
+          {
+            label: '普陀区5',
+            value: '5'
+          }
+        ]
       };
     },
-    mounted() {
-      this.tableData = [...this.tableData, mockData]
-    }
+    mounted() {}
   };
 </script>

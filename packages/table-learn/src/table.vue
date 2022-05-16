@@ -225,7 +225,6 @@
   import TableHeader from './table-header';
   import TableFooter from './table-footer';
   import { parseHeight } from './util';
-  import {mockData} from './mock';
 
   let tableIdSeed = 1;
 
@@ -629,7 +628,6 @@
     created() {
       this.tableId = 'el-table_' + tableIdSeed++;
       this.debouncedUpdateLayout = debounce(50, () => this.doLayout());
-      console.warn(mockData);
     },
 
     mounted() {
