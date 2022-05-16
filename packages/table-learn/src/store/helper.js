@@ -1,6 +1,7 @@
 import Store from './index';
 import debounce from 'throttle-debounce/debounce';
 
+// *生成一个专属于table的vuex-store
 export function createStore(table, initialState = {}) {
   if (!table) {
     throw new Error('Table is required.');

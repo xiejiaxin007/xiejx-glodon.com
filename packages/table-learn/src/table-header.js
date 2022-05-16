@@ -169,10 +169,12 @@ export default {
 
   computed: {
     table() {
+      // *父级才是真的table
       return this.$parent;
     },
 
     hasGutter() {
+      // TODO 用处是啥？
       return !this.fixed && this.tableLayout.gutterWidth;
     },
 
@@ -194,8 +196,12 @@ export default {
   mounted() {
     // nextTick 是有必要的 https://github.com/ElemeFE/element/pull/11311
     this.$nextTick(() => {
+      // *获取默认的排列顺序，prop表示要根据哪一列排序，而order则表示排列属性：升序、降序（ascending, descending）
+      // *在表头table中，有箭头icon需要展示
       const { prop, order } = this.defaultSort;
       const init = true;
+      // *放入自己的store中存储
+      // TODO 后续补充用途
       this.store.commit('sort', { prop, order, init });
     });
   },

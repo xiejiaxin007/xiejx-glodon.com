@@ -8,6 +8,7 @@ export default {
   },
 
   computed: {
+    // *获取父级组件的layout对象
     tableLayout() {
       let layout = this.layout;
       if (!layout && this.table) {
