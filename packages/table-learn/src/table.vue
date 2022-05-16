@@ -430,8 +430,10 @@
       }),
 
       bindEvents() {
+        // *滚动的事件监听
         this.bodyWrapper.addEventListener('scroll', this.syncPostion, { passive: true });
         if (this.fit) {
+          // *如果传入自定义fit为true，表示支持列宽度自动撑开
           addResizeListener(this.$el, this.resizeListener);
         }
       },
@@ -631,6 +633,7 @@
     },
 
     mounted() {
+      // *事件绑定
       this.bindEvents();
       this.store.updateColumns();
       this.doLayout();
@@ -655,6 +658,7 @@
     },
 
     destroyed() {
+      // *销毁事件绑定，提高性能
       this.unbindEvents();
     },
 
