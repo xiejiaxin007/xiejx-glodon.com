@@ -7,6 +7,7 @@ export function createStore(table, initialState = {}) {
     throw new Error('Table is required.');
   }
 
+  // *这个Store跟vuex不一样哦，是人家自定义的一个Watcher！！
   const store = new Store();
   store.table = table;
   // fix https://github.com/ElemeFE/element/issues/14075

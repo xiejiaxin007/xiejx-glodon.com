@@ -71,6 +71,7 @@ export default {
   render(h) {
     const originColumns = this.store.states.originColumns;
     const columnRows = convertToRows(originColumns, this.columns);
+    console.warn('columns: ', this.columns);
     // 是否拥有多级表头
     const isGroup = columnRows.length > 1;
     if (isGroup) this.$parent.isGroup = true;
@@ -85,17 +86,20 @@ export default {
             this.columns.map(column => <col name={ column.id } key={column.id} />)
           }
           {
+            // *留出滚动条的宽度
             this.hasGutter ? <col name="gutter" /> : ''
           }
         </colgroup>
         <thead class={ [{ 'is-group': isGroup, 'has-gutter': this.hasGutter }] }>
           {
+            // *vue中自带的方法，renderList，大概是批量render的意思
             this._l(columnRows, (columns, rowIndex) =>
               <tr
                 style={ this.getHeaderRowStyle(rowIndex) }
                 class={ this.getHeaderRowClass(rowIndex) }
               >
                 {
+                  // *因为isGroup是false，所以是正常表格（非多级表头），则thead应该只有一行，即只有一个tr，然后tr里面循环多列出来即可
                   columns.map((column, cellIndex) => (<th
                     colspan={ column.colSpan }
                     rowspan={ column.rowSpan }
@@ -421,6 +425,7 @@ export default {
     },
 
     handleMouseMove(event, column) {
+      // *如果有children，则代表还有树形结构
       if (column.children && column.children.length > 0) return;
       let target = event.target;
       while (target && target.tagName !== 'TH') {
