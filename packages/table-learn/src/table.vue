@@ -663,6 +663,7 @@
 
     data() {
       const { hasChildren = 'hasChildren', children = 'children' } = this.treeProps;
+      // *对应./store/index下的自定义Watcher
       this.store = createStore(this, {
         rowKey: this.rowKey,
         defaultExpandAll: this.defaultExpandAll,

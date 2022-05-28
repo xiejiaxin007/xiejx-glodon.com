@@ -33,6 +33,7 @@ export default {
     columnKey: String,
     align: String,
     headerAlign: String,
+    // *这个属性我看element-ui的官网没有
     showTooltipWhenOverflow: Boolean,
     showOverflowTooltip: Boolean,
     fixed: [Boolean, String],
@@ -68,7 +69,9 @@ export default {
 
   computed: {
     owner() {
+      // *获取父组件的vue实例，这样可以访问到table组件的所有内容
       let parent = this.$parent;
+      // *因为可能是column嵌套，所以我们需要找到真正的table组件，而不是单纯的父组件
       while (parent && !parent.tableId) {
         parent = parent.$parent;
       }
@@ -77,6 +80,7 @@ export default {
 
     columnOrTableParent() {
       let parent = this.$parent;
+      // *获取column或者table的父组件，其他父级组件不需要
       while (parent && !parent.tableId && !parent.columnId) {
         parent = parent.$parent;
       }
@@ -252,16 +256,19 @@ export default {
   },
 
   created() {
+    // *往上获取父组件，因为可能可能是嵌套column，所以有这个处理方式
     const parent = this.columnOrTableParent;
     this.isSubColumn = this.owner !== parent;
     this.columnId = (parent.tableId || parent.columnId) + '_column_' + columnIdSeed++;
 
     const type = this.type || 'default';
+    // *可能的值：custom-远程排序，true、false
     const sortable = this.sortable === '' ? true : this.sortable;
     const defaults = {
       ...cellStarts[type],
       id: this.columnId,
       type: type,
+      // *prop其实就是property，俩都是table获取的列字段key
       property: this.prop || this.property,
       align: this.realAlign,
       headerAlign: this.realHeaderAlign,
@@ -282,8 +289,9 @@ export default {
     const sortProps = ['sortMethod', 'sortBy', 'sortOrders'];
     const selectProps = ['selectable', 'reserveSelection'];
     const filterProps = ['filterMethod', 'filters', 'filterMultiple', 'filterOpened', 'filteredValue', 'filterPlacement'];
-
+    // *将多个数组合并，并把数组元素作为key值，将对应的value，转化为对象
     let column = this.getPropsData(basicProps, sortProps, selectProps, filterProps);
+    // *俩对象做一个合并，如果column里面属性是undefined，则不合并到defaults里头去
     column = mergeOptions(defaults, column);
 
     // 注意 compose 中函数执行的顺序是从右到左

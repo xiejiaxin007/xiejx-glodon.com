@@ -132,7 +132,12 @@ export const getKeysMap = function(array, rowKey) {
 function hasOwn(obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key);
 }
-
+/**
+ * @description: 合并两个对象，为空的时候不做合并
+ * @param 合并的主对象
+ * @param 往其他对象合并的对象，如果这个对象里头有undefined，则不往人家里头合并
+ * @return 合并完成后的对象
+ */
 export function mergeOptions(defaults, config) {
   const options = {};
   let key;
