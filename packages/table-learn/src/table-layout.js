@@ -42,6 +42,7 @@ class TableLayout {
 
   updateScrollY() {
     const height = this.height;
+    // *如果没有传入height，则表示表格可以无限往下延伸，不需要渲染scrollY
     if (height === null) return false;
     const bodyWrapper = this.table.bodyWrapper;
     if (this.table.$el && bodyWrapper) {
@@ -88,8 +89,9 @@ class TableLayout {
 
     return flattenColumns;
   }
-
+  // *修改表格高度，渲染表格的整体高度
   updateElsHeight() {
+    // *如果表格未渲染完成，则将这个方法放到下一个事件循环中
     if (!this.table.$ready) return Vue.nextTick(() => this.updateElsHeight());
     const { headerWrapper, appendWrapper, footerWrapper } = this.table.$refs;
     this.appendHeight = appendWrapper ? appendWrapper.offsetHeight : 0;
@@ -99,39 +101,49 @@ class TableLayout {
     // fix issue (https://github.com/ElemeFE/element/pull/16956)
     const headerTrElm = headerWrapper ? headerWrapper.querySelector('.el-table__header tr') : null;
     const noneHeader = this.headerDisplayNone(headerTrElm);
-
+    // *获取header的高度
+    // *这里需要注意，三元表达式前面的表达式是一个赋值语句，所以这个表达式的结果应该是赋值语句右边计算的值！！！
+    // *所以简单看，headerHeight的值就是根据showHeader的布尔值来判断的
     const headerHeight = this.headerHeight = !this.showHeader ? 0 : headerWrapper.offsetHeight;
+    // *如果有应该有header，但是header还没有渲染完成，则将本次方法放入下一个事件循环中去
     if (this.showHeader && !noneHeader && headerWrapper.offsetWidth > 0 && (this.table.columns || []).length > 0 && headerHeight < 2) {
       return Vue.nextTick(() => this.updateElsHeight());
     }
+    // *获取到header的高度
     const tableHeight = this.tableHeight = this.table.$el.clientHeight;
     const footerHeight = this.footerHeight = footerWrapper ? footerWrapper.offsetHeight : 0;
     if (this.height !== null) {
+      // TODO 计算表格body高度，为啥+1？？？
       this.bodyHeight = tableHeight - headerHeight - footerHeight + (footerWrapper ? 1 : 0);
     }
+    // * fixedBodyHeight和bodyHeight的区别就在于滚动条是否存在
     this.fixedBodyHeight = this.scrollX ? (this.bodyHeight - this.gutterWidth) : this.bodyHeight;
 
     const noData = !(this.store.states.data && this.store.states.data.length);
+    // * 如果没有数据，则直接展示tb的clientHeight，如果有数据，则跟fixedHeight一样
     this.viewportHeight = this.scrollX ? tableHeight - (noData ? 0 : this.gutterWidth) : tableHeight;
 
+    // *渲染水平滚动条，通过body实际高度跟视口高度的差别来判断是否需要y滚动条
     this.updateScrollY();
+    // *如果水平可以滚动，则根据gutterWidth给出一个滚动条的宽度
     this.notifyObservers('scrollable');
   }
-
   headerDisplayNone(elm) {
     if (!elm) return true;
     let headerChild = elm;
+    // *循环到获取div就会停止while循环
     while (headerChild.tagName !== 'DIV') {
       if (getComputedStyle(headerChild).display === 'none') {
         return true;
       }
+      // *逐级向上查找
       headerChild = headerChild.parentElement;
     }
     return false;
   }
-
   updateColumnsWidth() {
     if (Vue.prototype.$isServer) return;
+    // *【props属性】列的宽度是否自撑开
     const fit = this.fit;
     const bodyWidth = this.table.$el.clientWidth;
     let bodyMinWidth = 0;
@@ -229,7 +241,7 @@ class TableLayout {
       this.observers.splice(index, 1);
     }
   }
-
+  // scrollable
   notifyObservers(event) {
     const observers = this.observers;
     observers.forEach((observer) => {

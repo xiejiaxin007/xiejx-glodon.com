@@ -69,7 +69,9 @@ export default {
   mixins: [LayoutObserver],
 
   render(h) {
+    // TODO 暂未找到originColumns的出处
     const originColumns = this.store.states.originColumns;
+    // TODO 在处理什么
     const columnRows = convertToRows(originColumns, this.columns);
     // 是否拥有多级表头
     const isGroup = columnRows.length > 1;
@@ -85,6 +87,7 @@ export default {
             this.columns.map(column => <col name={ column.id } key={column.id} />)
           }
           {
+            // 留出滚动条的宽度
             this.hasGutter ? <col name="gutter" /> : ''
           }
         </colgroup>

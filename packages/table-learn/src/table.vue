@@ -14,6 +14,8 @@
     }, tableSize ? `el-table--${ tableSize }` : '']"
     @mouseleave="handleMouseLeave($event)">
     <div class="hidden-columns" ref="hiddenColumns"><slot></slot></div>
+    <!-- TODO v-mousewheel是一个自定义指令哦 -->
+    <!-- 表格的头部 -->
     <div
       v-if="showHeader"
       v-mousewheel="handleHeaderFooterMousewheel"
@@ -29,6 +31,7 @@
         }">
       </table-header>
     </div>
+    <!-- 表格的body模块 -->
     <div
       class="el-table__body-wrapper"
       ref="bodyWrapper"
@@ -61,6 +64,7 @@
         <slot name="append"></slot>
       </div>
     </div>
+    <!-- show-summary=true的时候展示，用于显示最后一行的合计 -->
     <div
       v-if="showSummary"
       v-show="data && data.length > 0"
@@ -78,6 +82,7 @@
         }">
       </table-footer>
     </div>
+    <!-- 如果有左侧固定列，则会增加这个模块的展示 -->
     <div
       v-if="fixedColumns.length > 0"
       v-mousewheel="handleFixedMousewheel"
@@ -139,6 +144,7 @@
           }"></table-footer>
       </div>
     </div>
+    <!-- 如果有右侧固定列，则会增加这个模块的展示 -->
     <div
       v-if="rightFixedColumns.length > 0"
       v-mousewheel="handleFixedMousewheel"
@@ -200,6 +206,7 @@
           }"></table-footer>
       </div>
     </div>
+    <!-- TODO 如果有右侧固定列，则展示这个模块，目前不知道干嘛 -->
     <div
       v-if="rightFixedColumns.length > 0"
       class="el-table__fixed-right-patch"
@@ -230,13 +237,10 @@
 
   export default {
     name: 'ElTableLearn',
-
     mixins: [Locale, Migrating],
-
     directives: {
       Mousewheel
     },
-
     props: {
       data: {
         type: Array,
@@ -244,15 +248,10 @@
           return [];
         }
       },
-
       size: String,
-
       width: [String, Number],
-
       height: [String, Number],
-
       maxHeight: [String, Number],
-
       fit: {
         type: Boolean,
         default: true
@@ -333,14 +332,12 @@
 
       load: Function
     },
-
     components: {
       TableHeader,
       TableFooter,
       TableBody,
       ElCheckbox
     },
-
     methods: {
       getMigratingConfig() {
         return {
@@ -467,8 +464,10 @@
           this.doLayout();
         }
       },
-
+      // *
       doLayout() {
+        // *如果设置了高度、最大高度或者是有固定fixed的设置
+        // *为什么加上了fixed，因为如果有fixed，则大概率就是需要水平滚动条的，所以需要留出滚动条的位置
         if (this.shouldUpdateHeight) {
           this.layout.updateElsHeight();
         }
@@ -484,7 +483,6 @@
       }
 
     },
-
     computed: {
       tableSize() {
         return this.size || (this.$ELEMENT || {}).size;
@@ -577,7 +575,8 @@
           height
         };
       },
-
+      // *将store里面的这些字段直接放到computed，所以后序可以直接使用this.xxx进行使用
+      // *这里全是字符串，所以在mapStates方法里面直接取的就是store定义的变量
       ...mapStates({
         selection: 'selection',
         columns: 'columns',
@@ -586,7 +585,6 @@
         rightFixedColumns: 'rightFixedColumns'
       })
     },
-
     watch: {
       height: {
         immediate: true,
@@ -613,6 +611,7 @@
       data: {
         immediate: true,
         handler(value) {
+          // !处理传入的data，进行表格组装
           this.store.commit('setData', value);
         }
       },

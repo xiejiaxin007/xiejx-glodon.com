@@ -3,14 +3,19 @@ import Watcher from './watcher';
 import { arrayFind } from 'element-ui/src/utils/util';
 
 Watcher.prototype.mutations = {
+  // *表格出入data后，进行组装
   setData(states, data) {
+    console.log(states, data);
     const dataInstanceChanged = states._data !== data;
     states._data = data;
 
+    // TODO之后看
     this.execQuery();
     // 数据变化，更新部分数据。
     // 没有使用 computed，而是手动更新部分数据 https://github.com/vuejs/vue/issues/6660#issuecomment-331417140
+    // TODO之后看
     this.updateCurrentRowData();
+    // TODO之后看
     this.updateExpandRows();
     if (states.reserveSelection) {
       this.assertRowKey();
@@ -130,7 +135,7 @@ Watcher.prototype.mutations = {
     this.updateCurrentRow(row);
   }
 };
-
+// this.store.commit('setData', value);
 Watcher.prototype.commit = function(name, ...args) {
   const mutations = this.mutations;
   if (mutations[name]) {

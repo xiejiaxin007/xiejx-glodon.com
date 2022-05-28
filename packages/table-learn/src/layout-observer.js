@@ -1,12 +1,12 @@
 export default {
   created() {
+    // 加入监听
     this.tableLayout.addObserver(this);
   },
-
   destroyed() {
+    // 移除监听
     this.tableLayout.removeObserver(this);
   },
-
   computed: {
     // *获取父级组件的layout对象
     tableLayout() {
@@ -20,7 +20,6 @@ export default {
       return layout;
     }
   },
-
   mounted() {
     this.onColumnsChange(this.tableLayout);
     this.onScrollableChange(this.tableLayout);
@@ -37,6 +36,7 @@ export default {
     onColumnsChange(layout) {
       const cols = this.$el.querySelectorAll('colgroup > col');
       if (!cols.length) return;
+      // *获取传入的column数组
       const flattenColumns = layout.getFlattenColumns();
       const columnsMap = {};
       flattenColumns.forEach((column) => {
