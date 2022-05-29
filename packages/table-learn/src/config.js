@@ -95,7 +95,7 @@ export function defaultRenderCell(h, { row, column, $index }) {
   }
   return value;
 }
-
+// *给树形结构的列加上前缀，这个前缀可能是一个缩进、icon或者是合集
 export function treeCellPrefix(h, { row, treeNode, store }) {
   if (!treeNode) return null;
   const ele = [];
@@ -103,10 +103,14 @@ export function treeCellPrefix(h, { row, treeNode, store }) {
     e.stopPropagation();
     store.loadOrToggle(row);
   };
+  // *当【树型】加载的时候，给了用户一个直接使用的属性indent，用于数的缩进的
   if (treeNode.indent) {
+    // *这里没有直接使用text-indent，我估计是因为这个属性是可以继承的，会出现在子元素里面
     ele.push(<span class="el-table__indent" style={{'padding-left': treeNode.indent + 'px'}}></span>);
   }
+  // *非懒加载的树型表格
   if (typeof treeNode.expanded === 'boolean' && !treeNode.noLazyChildren) {
+    // *因为是非懒加载，所以树型结构都会被打开，而类'el-table__expand-icon--expanded'就是打开属性结构的icon样式的类名，如果没有这个class，则这个icon是关闭的样式，则不会发生旋转
     const expandClasses = ['el-table__expand-icon', treeNode.expanded ? 'el-table__expand-icon--expanded' : ''];
     let iconClasses = ['el-icon-arrow-right'];
     if (treeNode.loading) {

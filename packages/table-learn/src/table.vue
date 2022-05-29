@@ -13,6 +13,7 @@
       'el-table--enable-row-transition': (store.states.data || []).length !== 0 && (store.states.data || []).length < 100
     }, tableSize ? `el-table--${ tableSize }` : '']"
     @mouseleave="handleMouseLeave($event)">
+    <!-- 放<el-table-column>子组件的插槽 -->
     <div class="hidden-columns" ref="hiddenColumns"><slot></slot></div>
     <!-- TODO v-mousewheel是一个自定义指令哦 -->
     <!-- 表格的头部 -->
@@ -634,6 +635,7 @@
     mounted() {
       // *事件绑定
       this.bindEvents();
+      // *一般就是更新数据-->更新每一列-->重新进行table渲染（高度和宽度）
       this.store.updateColumns();
       this.doLayout();
 

@@ -82,18 +82,24 @@ export default Vue.extend({
     },
 
     // 更新列
+    // *让每一列按照column定义的属性进行渲染，比如fixed属性
+    // *组装column的相关属性
     updateColumns() {
       const states = this.states;
       const _columns = states._columns || [];
+      // *左固定
       states.fixedColumns = _columns.filter((column) => column.fixed === true || column.fixed === 'left');
+      // *右固定
       states.rightFixedColumns = _columns.filter((column) => column.fixed === 'right');
-
+      // *这里使用了索引0，_columns[0]
+      // *这里是为了兼容当左边有固定，但是第一行是checkBox，则我们手动帮忙把checkBox也变成固定的
       if (states.fixedColumns.length > 0 && _columns[0] && _columns[0].type === 'selection' && !_columns[0].fixed) {
         _columns[0].fixed = true;
         states.fixedColumns.unshift(_columns[0]);
       }
-
+      // *没有固定属性的column
       const notFixedColumns = _columns.filter(column => !column.fixed);
+      // *所有的column放入到一个数组中
       states.originColumns = [].concat(states.fixedColumns).concat(notFixedColumns).concat(states.rightFixedColumns);
 
       const leafColumns = doFlattenColumns(notFixedColumns);

@@ -10,16 +10,30 @@
     <el-table-learn
     :data="tableData"
     style="width: 100%"
-    height="550">
+    :indent="30"
+    row-key="id"
+    height="550"
+    default-expand-all
+    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column
         type="index"
         width="50">
+        <template slot="header" slot-scope="scope">这是一个表头</template>
+      </el-table-column>
+      <!-- <el-table-column
+        type="selection">
+      </el-table-column> -->
+      <!-- <el-table-column
+        label="测试左固定"
+        fixed
+        prop="province"> -->
       </el-table-column>
       <el-table-column
         v-for="item in tbLabel"
         :key="item.prop"
         :prop="item.prop"
-        :label="item.name">
+        :label="item.name"
+        width="200px">
         <template slot-scope="scope">
           <el-input v-if="item.prop === 'address' || item.prop === 'name' || item.prop === 'zip' || item.prop === 'age'" v-model="scope.row[item.prop]" />
           <el-select v-else-if="item.prop === 'city'" v-model="scope.row[item.prop]" placeholder="请选择">
@@ -38,12 +52,12 @@
               :value="item.value">
             </el-option>
           </el-select>
-          <el-date-picker
+          <!-- <el-date-picker
             v-else-if="item.prop === 'date'"
             v-model="scope.row[item.prop]"
             type="date"
             placeholder="选择日期">
-          </el-date-picker>
+          </el-date-picker> -->
           <span v-else>{{scope.row[item.prop]}}</span>
         </template>
       </el-table-column>
@@ -130,6 +144,12 @@
         ]
       };
     },
-    mounted() {}
+    mounted() {},
+    methods: {
+      // *测试column的render-header属性是否有用，测试结果是无用，只会有一个warn提示
+      renderHeader(h) {
+        return h('div', 'test')
+      }
+    }
   };
 </script>

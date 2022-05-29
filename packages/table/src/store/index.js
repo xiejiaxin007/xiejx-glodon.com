@@ -3,6 +3,7 @@ import Watcher from './watcher';
 import { arrayFind } from 'element-ui/src/utils/util';
 
 Watcher.prototype.mutations = {
+  // *初次监听到data后的渲染处理
   setData(states, data) {
     const dataInstanceChanged = states._data !== data;
     states._data = data;
@@ -27,8 +28,16 @@ Watcher.prototype.mutations = {
     this.updateTableScrollY();
   },
 
+  /**
+   * @description: 对table-column进行渲染
+   * @param {Object} states 整个states数据对象，在apply的时候放进来的
+   * @param {Object} column 当前column的属性数据对象
+   * @param {Number} index 当前column应该在的索引位置
+   * @param {Object} parent 当前column的父级对象，一般就是在column进行嵌套的时候会有值
+   */
   insertColumn(states, column, index, parent) {
     let array = states._columns;
+    // TODO 等学习了嵌套再仔细看看
     if (parent) {
       array = parent.children;
       if (!array) array = parent.children = [];

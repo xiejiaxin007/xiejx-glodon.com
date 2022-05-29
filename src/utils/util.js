@@ -46,7 +46,15 @@ export const getValueByPath = function(object, prop) {
 
 export function getPropByPath(obj, path, strict) {
   let tempObj = obj;
+  // *正则匹配 .xxx 这样的格式，如果我们的column是循环出来的，则会出现这样的格式，则我们匹配到的就是‘prop’
+  // <el-table-column
+  //   v-for="item in tbLabel"
+  //   :key="item.prop"
+  //   :prop="item.prop"
+  //   :label="item.name">
+  // </el-table-column>
   path = path.replace(/\[(\w+)\]/g, '.$1');
+  console.log(path);
   path = path.replace(/^\./, '');
 
   let keyArr = path.split('.');

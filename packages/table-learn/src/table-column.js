@@ -33,6 +33,7 @@ export default {
     columnKey: String,
     align: String,
     headerAlign: String,
+    // *这个属性我看element-ui的官网没有
     showTooltipWhenOverflow: Boolean,
     showOverflowTooltip: Boolean,
     fixed: [Boolean, String],
@@ -68,7 +69,9 @@ export default {
 
   computed: {
     owner() {
+      // *获取父组件的vue实例，这样可以访问到table组件的所有内容
       let parent = this.$parent;
+      // *因为可能是column嵌套，所以我们需要找到真正的table组件，而不是单纯的父组件
       while (parent && !parent.tableId) {
         parent = parent.$parent;
       }
@@ -77,6 +80,7 @@ export default {
 
     columnOrTableParent() {
       let parent = this.$parent;
+      // *获取column或者table的父组件，其他父级组件不需要
       while (parent && !parent.tableId && !parent.columnId) {
         parent = parent.$parent;
       }
@@ -115,17 +119,21 @@ export default {
     getColumnElIndex(children, child) {
       return [].indexOf.call(children, child);
     },
-
+    // *设置column的width相关属性
     setColumnWidth(column) {
+      // *优先使用设置的width属性
       if (this.realWidth) {
         column.width = this.realWidth;
       }
+      // *其次如果设置了min-width，也需要设置上
       if (this.realMinWidth) {
         column.minWidth = this.realMinWidth;
       }
+      // *如果没有min-width设置，则使用默认的80
       if (!column.minWidth) {
         column.minWidth = 80;
       }
+      // *设置列的realWidth属性
       column.realWidth = column.width === undefined ? column.minWidth : column.width;
       return column;
     },
@@ -148,7 +156,9 @@ export default {
       if (this.renderHeader) {
         console.warn('[Element Warn][TableColumn]Comparing to render-header, scoped-slot header is easier to use. We recommend users to use scoped-slot header.');
       } else if (column.type !== 'selection') {
+        // *可能是：序号（index）、展开列（expand）、-（正常的一个列）
         column.renderHeader = (h, scope) => {
+          // * $scopedSlots实际上获取的是slot-scope
           const renderHeader = this.$scopedSlots.header;
           return renderHeader ? renderHeader(scope) : column.label;
         };
@@ -157,6 +167,7 @@ export default {
       let originRenderCell = column.renderCell;
       // TODO: 这里的实现调整
       if (column.type === 'expand') {
+        // *如果是展开列，则需要单独进行设置
         // 对于展开行，renderCell 不允许配置的。在上一步中已经设置过，这里需要简单封装一下。
         column.renderCell = (h, data) => (<div class="cell">
           { originRenderCell(h, data) }
@@ -172,10 +183,15 @@ export default {
         column.renderCell = (h, data) => {
           let children = null;
           if (this.$scopedSlots.default) {
+            // *如果我们的cell里头有内容，则用户自己设置了列的defaultSlot，则渲染用户加进去的
+            // *比如<el-table-column>这个就是我加进去的</el-table-column>
             children = this.$scopedSlots.default(data);
           } else {
+            // *如果用户只给了一个空的el-table-column标签，则使用内置的render方法了
             children = originRenderCell(h, data);
           }
+          // *这个地方是说如果是树形结构的列，则渲染列的前面的占位，可能是一个缩进、可能是一个icon以及icon的样式
+          // *这个方法里面会判断，如果没有【treeNode】这个属性，则不会进行操作，我估计意思就是，如果有【treeNode】这个属性，说明当前肯定是一个树形结构的列渲染
           const prefix = treeCellPrefix(h, data);
           const props = {
             class: 'cell',
@@ -207,7 +223,7 @@ export default {
         prev[cur] = cur;
         return prev;
       }, aliases);
-
+      // *动态添加watch监听，做到实时修改columnConfig的配置数据
       Object.keys(allAliases).forEach(key => {
         const columnKey = aliases[key];
 
@@ -252,16 +268,19 @@ export default {
   },
 
   created() {
+    // *往上获取父组件，因为可能可能是嵌套column，所以有这个处理方式
     const parent = this.columnOrTableParent;
     this.isSubColumn = this.owner !== parent;
     this.columnId = (parent.tableId || parent.columnId) + '_column_' + columnIdSeed++;
 
     const type = this.type || 'default';
+    // *可能的值：custom-远程排序，true、false
     const sortable = this.sortable === '' ? true : this.sortable;
     const defaults = {
       ...cellStarts[type],
       id: this.columnId,
       type: type,
+      // *prop其实就是property，俩都是table获取的列字段key
       property: this.prop || this.property,
       align: this.realAlign,
       headerAlign: this.realHeaderAlign,
@@ -282,11 +301,14 @@ export default {
     const sortProps = ['sortMethod', 'sortBy', 'sortOrders'];
     const selectProps = ['selectable', 'reserveSelection'];
     const filterProps = ['filterMethod', 'filters', 'filterMultiple', 'filterOpened', 'filteredValue', 'filterPlacement'];
-
+    // *将多个数组合并，并把数组元素作为key值，将对应的value，转化为对象
     let column = this.getPropsData(basicProps, sortProps, selectProps, filterProps);
+    // *俩对象做一个合并，如果column里面属性是undefined，则不合并到defaults里头去
     column = mergeOptions(defaults, column);
 
     // 注意 compose 中函数执行的顺序是从右到左
+    // *第一步，setColumnForcedProps：配置某一种类型的column不能修改某些属性，目前我看到的就一个classname属性是单独设置的
+    // *第二步，setColumnWidth：设置每一列的宽度属性，放到column对象里面
     const chains = compose(this.setColumnRenders, this.setColumnWidth, this.setColumnForcedProps);
     column = chains(column);
 
@@ -300,7 +322,9 @@ export default {
   mounted() {
     const owner = this.owner;
     const parent = this.columnOrTableParent;
+    // *获取column
     const children = this.isSubColumn ? parent.$el.children : parent.$refs.hiddenColumns.children;
+    // *找出的当前的column在整个表格中的索引
     const columnIndex = this.getColumnElIndex(children, this.$el);
 
     owner.store.commit('insertColumn', this.columnConfig, columnIndex, this.isSubColumn ? parent.columnConfig : null);

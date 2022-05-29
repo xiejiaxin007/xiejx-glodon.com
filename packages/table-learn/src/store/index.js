@@ -31,17 +31,25 @@ Watcher.prototype.mutations = {
 
     this.updateTableScrollY();
   },
-
+  /**
+   * @description: 对table-column进行渲染
+   * @param {Object} states 整个states数据对象，在apply的时候放进来的
+   * @param {Object} column 当前column的属性数据对象
+   * @param {Number} index 当前column应该在的索引位置
+   * @param {Object} parent 当前column的父级对象，一般就是在column进行嵌套的时候会有值
+   */
   insertColumn(states, column, index, parent) {
     let array = states._columns;
     if (parent) {
       array = parent.children;
       if (!array) array = parent.children = [];
     }
-
+    // !就是在这个地方！！！！把column的信息跟table打通了！！终于找到了
+    // *el-table和el-table-column两个组件进行数据沟通，所以我们在el-table的store里面拿到了column的数据信息
     if (typeof index !== 'undefined') {
       array.splice(index, 0, column);
     } else {
+      // TODO 这个地方不知道什么时候会触发
       array.push(column);
     }
 
