@@ -154,9 +154,11 @@ export function mergeOptions(defaults, config) {
   }
   return options;
 }
-
+// *获取传入值的数字部分
 export function parseWidth(width) {
   if (width !== undefined) {
+    // *parseInt有一个特殊的情况在于，会最大限度将传入的值转换为数字，如果从第一个字符串就数字类型，则会在第一个不是数字类型字符串地方停止，比如‘12aa’会被转换为12
+    // *这个地方主要就是把width属性转入的值转换为数字类型
     width = parseInt(width, 10);
     if (isNaN(width)) {
       width = null;

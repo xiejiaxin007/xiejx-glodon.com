@@ -5,7 +5,6 @@ import { arrayFind } from 'element-ui/src/utils/util';
 Watcher.prototype.mutations = {
   // *表格出入data后，进行组装
   setData(states, data) {
-    console.log(states, data);
     const dataInstanceChanged = states._data !== data;
     states._data = data;
 

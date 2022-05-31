@@ -9,7 +9,6 @@
   <div style="margin: 20px;">
     <el-table-learn
     :data="tableData"
-    style="width: 100%"
     :indent="30"
     row-key="id"
     height="550"
@@ -17,7 +16,7 @@
     :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column
         type="index"
-        width="50">
+        fixed>
         <template slot="header" slot-scope="scope">这是一个表头</template>
       </el-table-column>
       <!-- <el-table-column
@@ -26,14 +25,14 @@
       <!-- <el-table-column
         label="测试左固定"
         fixed
-        prop="province"> -->
-      </el-table-column>
+        prop="province">
+      </el-table-column> -->
       <el-table-column
         v-for="item in tbLabel"
         :key="item.prop"
         :prop="item.prop"
-        :label="item.name"
-        width="200px">
+        :width="(item.prop === 'address' || item.prop === 'name' || item.prop === 'zip' || item.prop === 'age') ? 400 : ''"
+        :label="item.name">
         <template slot-scope="scope">
           <el-input v-if="item.prop === 'address' || item.prop === 'name' || item.prop === 'zip' || item.prop === 'age'" v-model="scope.row[item.prop]" />
           <el-select v-else-if="item.prop === 'city'" v-model="scope.row[item.prop]" placeholder="请选择">

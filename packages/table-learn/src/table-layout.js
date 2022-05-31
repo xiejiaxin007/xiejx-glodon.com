@@ -24,6 +24,7 @@ class TableLayout {
     this.viewportHeight = null; // Table Height - Scroll Bar Height
     this.bodyHeight = null; // Table Height - Table Header Height
     this.fixedBodyHeight = null; // Table Height - Table Header Height - Scroll Bar Height
+    // *这儿实际是在计算当前浏览器的滚动条宽度
     this.gutterWidth = scrollbarWidth();
 
     for (let name in options) {
@@ -113,7 +114,7 @@ class TableLayout {
     const tableHeight = this.tableHeight = this.table.$el.clientHeight;
     const footerHeight = this.footerHeight = footerWrapper ? footerWrapper.offsetHeight : 0;
     if (this.height !== null) {
-      // TODO 计算表格body高度，为啥+1？？？
+      // TODO 计算表格body高度，为啥+1？？？可能是有一个border？？
       this.bodyHeight = tableHeight - headerHeight - footerHeight + (footerWrapper ? 1 : 0);
     }
     // * fixedBodyHeight和bodyHeight的区别就在于滚动条是否存在
@@ -141,51 +142,70 @@ class TableLayout {
     }
     return false;
   }
+  // *更新表格列的宽度
+  // !根据width和min-width来计算是否有滚动条，同时计算出来realwidth，表示实际要渲染的宽度（因为有时候可能就算你是设置了width，渲染出来可能不是你说的那个宽度，比如说列太多了又没有滚动条，那你设置的width大概率是不会正常渲染出来的）
   updateColumnsWidth() {
     if (Vue.prototype.$isServer) return;
     // *【props属性】列的宽度是否自撑开
     const fit = this.fit;
+    // *clientWidth表示容器内部的宽度，包括padding，但是不包括border、margin和垂直滚动条的宽度
     const bodyWidth = this.table.$el.clientWidth;
     let bodyMinWidth = 0;
 
+    // *打平数据结构，获取所有的column对象，如果有分组，也要将分组的加进来
     const flattenColumns = this.getFlattenColumns();
+    // *找出width设置成不能转换为数字的column，比如不给width的时候，就是undefined，则这部分column需要做均分（flex）
     let flexColumns = flattenColumns.filter((column) => typeof column.width !== 'number');
-
-    flattenColumns.forEach((column) => { // Clean those columns whose width changed from flex to unflex
+    // TODO这一步不懂
+    flattenColumns.forEach((column) => {
       if (typeof column.width === 'number' && column.realWidth) column.realWidth = null;
     });
-
+    // *fit默认就是true，所以这里我们只看是否有column为设置width
     if (flexColumns.length > 0 && fit) {
+      // *计算内容宽度
       flattenColumns.forEach((column) => {
+        // !这里需要注意，不是只加入了width，还加入了minwidth，但是前面只判断了width，也就是后面为什么不是直接平分剩余宽度，而且需要加上minwidth
         bodyMinWidth += column.width || column.minWidth || 80;
       });
 
+      // *判断如果有滚动条则设置滚动条宽度
       const scrollYWidth = this.scrollY ? this.gutterWidth : 0;
-
-      if (bodyMinWidth <= bodyWidth - scrollYWidth) { // DON'T HAVE SCROLL BAR
+      // *没有横向滚动条的情况
+      if (bodyMinWidth <= bodyWidth - scrollYWidth) {
         this.scrollX = false;
 
+        // *这里是在计算没有设置width的column应该占的宽度
         const totalFlexWidth = bodyWidth - scrollYWidth - bodyMinWidth;
-
         if (flexColumns.length === 1) {
+          // !只有一个没有设置width的column，宽度不是flex宽度，而需要再加80，因为前面计算剩余宽度的时候减去了（minwidth || 80）
+          // *解答：因为前面计算剩余宽度的时候，减去了（minwidth || 80）
           flexColumns[0].realWidth = (flexColumns[0].minWidth || 80) + totalFlexWidth;
         } else {
+          // *把所有没有设置宽度的column计算一个总宽度（如果有最小宽度则使用最小宽度，否则就给一个默认值）
           const allColumnsWidth = flexColumns.reduce((prev, column) => prev + (column.minWidth || 80), 0);
+          // *计算出一个比例
+          // !这里计算一个比例是因为，我们这个分支里面是没有滚动条的情况，没有滚动条则需要让没有设置width的column均分剩下的宽度
           const flexWidthPerPixel = totalFlexWidth / allColumnsWidth;
           let noneFirstWidth = 0;
 
           flexColumns.forEach((column, index) => {
+            // *如果循环到第一个则跳出循环
+            // TODO why第一个要单独搞，可能是因为下面计算宽度会出现小数，所以我们锁定一个column来给剩余width？？
             if (index === 0) return;
             const flexWidth = Math.floor((column.minWidth || 80) * flexWidthPerPixel);
             noneFirstWidth += flexWidth;
             column.realWidth = (column.minWidth || 80) + flexWidth;
           });
-
+          // *第一列的宽度是最小宽度+剩下来的宽度
+          // *可能是因为下面计算宽度会出现小数，所以我们锁定一个column来给剩余width，这样才能确保剩余的宽度被全部分完，否则肯定有小数被忽略了
           flexColumns[0].realWidth = (flexColumns[0].minWidth || 80) + totalFlexWidth - noneFirstWidth;
         }
-      } else { // HAVE HORIZONTAL SCROLL BAR
+      } else {
+        // *有横向滚动条的情况
         this.scrollX = true;
+        // *直接将minwidth赋值给realwidth，不需要计算均分什么的
         flexColumns.forEach(function(column) {
+          // *这里直接赋值minwidth，如果用户设置了，则就是用设置的，否则会直接使用默认的80，因为table-column文件里面设置了最小宽度
           column.realWidth = column.minWidth;
         });
       }
@@ -193,6 +213,7 @@ class TableLayout {
       this.bodyWidth = Math.max(bodyMinWidth, bodyWidth);
       this.table.resizeState.width = this.bodyWidth;
     } else {
+      // *如果设置fit为false，则表格不会自动撑开，而是直接根据设置的width来进行渲染，也不会进行剩余宽度均分
       flattenColumns.forEach((column) => {
         if (!column.width && !column.minWidth) {
           column.realWidth = 80;
@@ -202,6 +223,7 @@ class TableLayout {
 
         bodyMinWidth += column.realWidth;
       });
+      // *这里就是完全根据设置的宽度来决定是否有横向滚动条了
       this.scrollX = bodyMinWidth > bodyWidth;
 
       this.bodyWidth = bodyMinWidth;
@@ -209,9 +231,11 @@ class TableLayout {
 
     const fixedColumns = this.store.states.fixedColumns;
 
+    // *如果有左固定列的逻辑处理
     if (fixedColumns.length > 0) {
       let fixedWidth = 0;
       fixedColumns.forEach(function(column) {
+        // *这里会根据计算后的宽度来进行选取，所以把realwidth放前面，有值就不取width了
         fixedWidth += column.realWidth || column.width;
       });
 
@@ -231,6 +255,7 @@ class TableLayout {
     this.notifyObservers('columns');
   }
 
+  // *添加observer，使用到的是table-header、table-body、table-footer，各自一个observer
   addObserver(observer) {
     this.observers.push(observer);
   }
