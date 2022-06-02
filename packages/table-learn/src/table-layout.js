@@ -43,12 +43,14 @@ class TableLayout {
 
   updateScrollY() {
     const height = this.height;
-    // *如果没有传入height，则表示表格可以无限往下延伸，不需要渲染scrollY
+    // *如果没有传入height，则表示表格可以无限往下延伸，不需要渲染scrollY，也就是不需要渲染垂直滚动条
     if (height === null) return false;
     const bodyWrapper = this.table.bodyWrapper;
     if (this.table.$el && bodyWrapper) {
+      // *获取table-body组件的表格dom
       const body = bodyWrapper.querySelector('.el-table__body');
       const prevScrollY = this.scrollY;
+      // *this.Height表示的是整个表格除了头部和底部的高度，应该就是可是高度，如果offsetHeight超过了这个高度，则需要垂直滚动条
       const scrollY = body.offsetHeight > this.bodyHeight;
       this.scrollY = scrollY;
       return prevScrollY !== scrollY;
@@ -269,6 +271,7 @@ class TableLayout {
   // scrollable
   notifyObservers(event) {
     const observers = this.observers;
+    // *通知每一个observer进行更新
     observers.forEach((observer) => {
       switch (event) {
         case 'columns':

@@ -28,6 +28,7 @@ export function toObject(arr) {
 
 export const getValueByPath = function(object, prop) {
   prop = prop || '';
+  // *a.b.c  [a,b,c]
   const paths = prop.split('.');
   let current = object;
   let result = null;
@@ -35,10 +36,14 @@ export const getValueByPath = function(object, prop) {
     const path = paths[i];
     if (!current) break;
 
+    // *path中的最后一个元素
     if (i === j - 1) {
       result = current[path];
       break;
     }
+    // *这么做是想要拿到对象中的最后一个属性名字
+    // *比如a.b.c，那么我们会慢慢往最后一个属性名走，等到了最后一个，就将值赋值给result来返回
+    // *取的顺序：current.a---->current.a.b---->current.a.b.c
     current = current[path];
   }
   return result;
@@ -106,6 +111,12 @@ export const arrayFindIndex = function(arr, pred) {
   return -1;
 };
 
+/**
+ * @description: 在数组中根据传入规则来匹配内容
+ * @param arr 被寻找的数组
+ * @param pred 查找的规则方法回调
+ * @return 查找后的结果，相当于重新封装了一下findIndex
+ */
 export const arrayFind = function(arr, pred) {
   const idx = arrayFindIndex(arr, pred);
   return idx !== -1 ? arr[idx] : undefined;

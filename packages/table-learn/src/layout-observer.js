@@ -53,6 +53,7 @@ export default {
       }
     },
 
+    // *根据滚动条宽度来设置gutter宽度
     onScrollableChange(layout) {
       const cols = this.$el.querySelectorAll('colgroup > col[name=gutter]');
       for (let i = 0, j = cols.length; i < j; i++) {

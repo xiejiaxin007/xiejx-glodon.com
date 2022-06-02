@@ -79,12 +79,15 @@ Watcher.prototype.mutations = {
     }
   },
 
+  // *排序方法
   sort(states, options) {
     const { prop, order, init } = options;
     if (prop) {
+      // *有对应的prop，才能进行排序动作
       const column = arrayFind(states.columns, column => column.property === prop);
       if (column) {
         column.order = order;
+        // *更新sort对象属性
         this.updateSort(column, prop, order);
         this.commit('changeSortCondition', { init });
       }
@@ -101,6 +104,7 @@ Watcher.prototype.mutations = {
     const ingore = { filter: true };
     this.execQuery(ingore);
 
+    // TODO后续继续看
     if (!options || !(options.silent || options.init)) {
       this.table.$emit('sort-change', {
         column,
@@ -109,15 +113,18 @@ Watcher.prototype.mutations = {
       });
     }
 
+    // TODO排序之后感觉不需要进行高度渲染啊？？
     this.updateTableScrollY();
   },
 
   filterChange(states, options) {
     let { column, values, silent } = options;
+    // *生成filters，包括传入的filtered-value
     const newFilters = this.updateFilters(column, values);
 
     this.execQuery();
 
+    // TODO 后续再看
     if (!silent) {
       this.table.$emit('filter-change', newFilters);
     }

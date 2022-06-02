@@ -13,6 +13,7 @@
     row-key="id"
     height="550"
     default-expand-all
+    :default-sort = "{prop: 'date', order: 'descending'}"
     :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column
         type="index"
@@ -31,6 +32,8 @@
         v-for="item in tbLabel"
         :key="item.prop"
         :prop="item.prop"
+        :filtered-value="(item.prop === 'age') ? ['2'] : []"
+        :filter-method="(item.prop === 'age') ? dataFilter : null"
         :width="(item.prop === 'address' || item.prop === 'name' || item.prop === 'zip' || item.prop === 'age') ? 400 : ''"
         :label="item.name">
         <template slot-scope="scope">
@@ -145,6 +148,9 @@
     },
     mounted() {},
     methods: {
+      dataFilter(value, row, column) {
+        return row[column.property] === value;
+      },
       // *测试column的render-header属性是否有用，测试结果是无用，只会有一个warn提示
       renderHeader(h) {
         return h('div', 'test')

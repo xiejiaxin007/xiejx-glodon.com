@@ -379,6 +379,7 @@
       },
 
       updateScrollY() {
+        // *判断是否要改变垂直滚动条的显示
         const changed = this.layout.updateScrollY();
         if (changed) {
           this.layout.notifyObservers('scrollable');
@@ -644,8 +645,9 @@
         height: this.$el.offsetHeight
       };
 
-      // init filters
+      // *进行默认筛选
       this.store.states.columns.forEach(column => {
+        // TODO为什么不先判断filter-method字段？？？这里进去我看真正实现filter是需要这个字段的
         if (column.filteredValue && column.filteredValue.length) {
           this.store.commit('filterChange', {
             column,
@@ -655,6 +657,7 @@
         }
       });
 
+      // *表示当前已经渲染完毕
       this.$ready = true;
     },
 

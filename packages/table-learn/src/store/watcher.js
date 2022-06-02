@@ -7,6 +7,7 @@ import tree from './tree';
 
 const sortData = (data, states) => {
   const sortingColumn = states.sortingColumn;
+  // *没有sortingColumn或者sortable设置成custom或者是其他字符串的，直接返回原数据
   if (!sortingColumn || typeof sortingColumn.sortable === 'string') {
     return data;
   }
@@ -270,6 +271,7 @@ export default Vue.extend({
       return filters;
     },
 
+    // *对列表进行排序
     updateSort(column, prop, order) {
       if (this.states.sortingColumn && this.states.sortingColumn !== column) {
         this.states.sortingColumn.order = null;
@@ -279,11 +281,12 @@ export default Vue.extend({
       this.states.sortOrder = order;
     },
 
+    // *执行筛选功能
     execFilter() {
       const states = this.states;
       const { _data, filters } = states;
       let data = _data;
-
+      console.warn(filters);
       Object.keys(filters).forEach((columnId) => {
         const values = states.filters[columnId];
         if (!values || values.length === 0) return;
@@ -297,14 +300,16 @@ export default Vue.extend({
 
       states.filteredData = data;
     },
-
+    // *调用排序方法，同时将排序完成后的数据赋给states
     execSort() {
       const states = this.states;
       states.data = sortData(states.filteredData, states);
     },
 
     // 根据 filters 与 sort 去过滤 data
+    // filte：true
     execQuery(ignore) {
+      // *需要筛选的时候就调用
       if (!(ignore && ignore.filter)) {
         this.execFilter();
       }

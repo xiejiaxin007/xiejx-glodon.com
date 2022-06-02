@@ -17,16 +17,26 @@ const isObject = function(obj) {
   return obj !== null && typeof obj === 'object';
 };
 
+// *根据传入的排序方式进行排序，返回排序完成后的数据
 export const orderBy = function(array, sortKey, reverse, sortMethod, sortBy) {
+  // *如果都没有排序规则，则直接返回数据即可
   if (!sortKey && !sortMethod && (!sortBy || Array.isArray(sortBy) && !sortBy.length)) {
     return array;
   }
+  // *如果是在渲染默认排序，则reverse就是一个string，表示默认排序的order
   if (typeof reverse === 'string') {
+    // *-1表示降序，1表示升序
     reverse = reverse === 'descending' ? -1 : 1;
   } else {
+    // TODO还没有看到这种情况
     reverse = (reverse && reverse < 0) ? -1 : 1;
   }
+  // *sortMthod表示排序方法，自定义排序，用法和Array.sort比较像
+  // *这里的判断是因为如果我们设置了sort-method，则sort-by属性就是失效状态，所以我们需要优先判断，是否设置了sort-method属性
+  // !这个方法是拿来获取需要排序的prop对应的value值的，拿到这个value值之后进行一个排序
   const getKey = sortMethod ? null : function(value, index) {
+    // *设置了sort-by的情况下
+    // *在这里我们可以看到排序的规则取值顺序：sort-mothod、sort-by、
     if (sortBy) {
       if (!Array.isArray(sortBy)) {
         sortBy = [sortBy];
@@ -35,19 +45,27 @@ export const orderBy = function(array, sortKey, reverse, sortMethod, sortBy) {
         if (typeof by === 'string') {
           return getValueByPath(value, by);
         } else {
+          // *可能sort-by传入的是一个function，所以就直接将执行结果返回即可
+          // TODO这个地方返回的可能是内层的对象
           return by(value, index, array);
         }
       });
     }
+    // *sort-key在默认排序的情况下是传入的那个prop
+    // TODO目前还不清楚这个$key是啥意思
     if (sortKey !== '$key') {
+      // TODO $value
       if (isObject(value) && '$value' in value) value = value.$value;
     }
     return [isObject(value) ? getValueByPath(value, sortKey) : value];
   };
   const compare = function(a, b) {
+    // *sortmethod写法和sort一样，所以可以直接返回执行后的返回值
     if (sortMethod) {
       return sortMethod(a.value, b.value);
     }
+    // !这个地方挺好，巧妙
+    // *排序的规则prop可能是多个，所以会进行循环，只要匹配到下面两种情况就立马返回，这样可以做到靠前的prop优先级更高
     for (let i = 0, len = a.key.length; i < len; i++) {
       if (a.key[i] < b.key[i]) {
         return -1;
@@ -70,6 +88,7 @@ export const orderBy = function(array, sortKey, reverse, sortMethod, sortBy) {
       // make stable https://en.wikipedia.org/wiki/Sorting_algorithm#Stability
       order = a.index - b.index;
     }
+    // *相乘可以根据用户给的排序方式进行逆转
     return order * reverse;
   }).map(item => item.value);
 };
