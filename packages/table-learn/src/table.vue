@@ -207,7 +207,7 @@
           }"></table-footer>
       </div>
     </div>
-    <!-- TODO 如果有右侧固定列，则展示这个模块，目前不知道干嘛 -->
+    <!-- TODO 如果有右侧固定列，则展示这个模块，目前不知道干嘛————这个大概率是一个滚动条，就是如果有右侧固定列的话，必须是有要有滚动条才可能出现固定列 -->
     <div
       v-if="rightFixedColumns.length > 0"
       class="el-table__fixed-right-patch"
@@ -648,6 +648,7 @@
       // *进行默认筛选
       this.store.states.columns.forEach(column => {
         // TODO为什么不先判断filter-method字段？？？这里进去我看真正实现filter是需要这个字段的
+        // TODO可能是这个是默认情况？？需要先做一个filtered-value的存储，后续会用上？
         if (column.filteredValue && column.filteredValue.length) {
           this.store.commit('filterChange', {
             column,

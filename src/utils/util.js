@@ -59,7 +59,6 @@ export function getPropByPath(obj, path, strict) {
   //   :label="item.name">
   // </el-table-column>
   path = path.replace(/\[(\w+)\]/g, '.$1');
-  console.log(path);
   path = path.replace(/^\./, '');
 
   let keyArr = path.split('.');

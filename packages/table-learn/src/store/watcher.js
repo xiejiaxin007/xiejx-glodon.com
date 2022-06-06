@@ -286,13 +286,14 @@ export default Vue.extend({
       const states = this.states;
       const { _data, filters } = states;
       let data = _data;
-      console.warn(filters);
       Object.keys(filters).forEach((columnId) => {
         const values = states.filters[columnId];
         if (!values || values.length === 0) return;
         const column = getColumnById(this.states, columnId);
+        // *filtered-value必须要配合filter-method才能发挥作用
         if (column && column.filterMethod) {
           data = data.filter((row) => {
+            // !就是这个地方表示需要filtered-value和filter-method进行配合
             return values.some(value => column.filterMethod.call(null, value, row, column));
           });
         }

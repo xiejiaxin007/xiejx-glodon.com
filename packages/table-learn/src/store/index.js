@@ -39,8 +39,10 @@ Watcher.prototype.mutations = {
    */
   insertColumn(states, column, index, parent) {
     let array = states._columns;
+    // *这里巧妙利用数组的引用类型特点，如果是column嵌套，则给该column设置children属性
     if (parent) {
       array = parent.children;
+      // !如果是column嵌套，则会将parent.children赋值给array进行column添加，这样同时就是给parent设置了一个children属性了
       if (!array) array = parent.children = [];
     }
     // !就是在这个地方！！！！把column的信息跟table打通了！！终于找到了
