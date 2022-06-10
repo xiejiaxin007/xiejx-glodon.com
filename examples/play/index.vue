@@ -22,7 +22,7 @@
         fixed>
         <!-- TODO 这个地方需要注意，估计是scope里面的store数据量太大了，导致页面死循环了 -->
         <template slot="header" slot-scope="scope">
-          <span>这是一个自定义表头</span>
+          <span style="display:inline-block;width:50px"><i>这是一个自定义表头</i></span>
         </template>
       </el-table-column>
       <!-- <el-table-column
@@ -34,7 +34,7 @@
         prop="province">
       </el-table-column> -->
       <el-table-column label="个性特点">
-        <el-table-column label="性别" prop="sex" :filter-method="dataFilter" width="200">
+        <el-table-column label="性别" prop="sex" :filter-method="dataFilter" width="200" :filters="filters" :filtered-value="['2']" filter-placement="top-start">
           <template slot-scope="scope">
             <el-select v-model="scope.row.sex" placeholder="请选择">
               <el-option
@@ -46,17 +46,17 @@
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column label="年龄" prop="age" width="100"></el-table-column>
+        <el-table-column label="年龄" prop="age" width="100" sortable :sort-orders="['ascending', 'descending']"></el-table-column>
       </el-table-column>
       <!-- :filtered-value="(item.prop === 'age') ? ['2'] : []" -->
       <template v-for="item in tbLabel">
-        <el-table-column v-if="item.prop !== 'sex' && item.prop !== 'age'"
+        <el-table-column v-if="item.prop !== 'sex' && item.prop !== 'age' && item.prop !== 'zip'"
           :key="item.prop"
           :prop="item.prop"
-          :width="(item.prop === 'address' || item.prop === 'name' || item.prop === 'zip') ? 400 : ''"
+          :width="400"
           :label="item.name">
           <template slot-scope="scope">
-            <el-input v-if="item.prop === 'address' || item.prop === 'name' || item.prop === 'zip'" v-model="scope.row[item.prop]" />
+            <el-input v-if="item.prop === 'address' || item.prop === 'name'" v-model="scope.row[item.prop]" />
             <el-select v-else-if="item.prop === 'city'" v-model="scope.row[item.prop]" placeholder="请选择">
               <el-option
                 v-for="item in options"
@@ -75,6 +75,11 @@
           </template>
         </el-table-column>
       </template>
+      <el-table-column label="邮政编码" prop="zip" fixed="right" width="200">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.zip" />
+        </template>
+      </el-table-column>
     </el-table-learn>
   </div>
 </template>
@@ -115,6 +120,16 @@
   export default {
     data() {
       return {
+        filters: [
+          {
+            text: '男',
+            value: '1'
+          },
+          {
+            text: '女',
+            value: '2'
+          }
+        ],
         tableData: mockData,
         tbLabel: tbLabel,
         form: {
@@ -160,6 +175,9 @@
     },
     mounted() {},
     methods: {
+      headerClickTest() {
+        console.log(111);
+      },
       dataFilter(value, row, column) {
         return row[column.property] === value;
       },

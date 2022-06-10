@@ -41,9 +41,13 @@ export default Vue.extend({
 
         // 列
         _columns: [], // 不可响应的
+        // *所有的一级列
         originColumns: [],
+        // *所有列，可能包括嵌套的子列
         columns: [],
+        // *左固定的列
         fixedColumns: [],
+        // *右固定的列
         rightFixedColumns: [],
         leafColumns: [],
         fixedLeafColumns: [],
@@ -286,6 +290,7 @@ export default Vue.extend({
       const states = this.states;
       const { _data, filters } = states;
       let data = _data;
+      console.log(filters);
       Object.keys(filters).forEach((columnId) => {
         const values = states.filters[columnId];
         if (!values || values.length === 0) return;

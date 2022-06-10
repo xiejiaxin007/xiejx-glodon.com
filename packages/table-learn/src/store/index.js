@@ -106,8 +106,9 @@ Watcher.prototype.mutations = {
     const ingore = { filter: true };
     this.execQuery(ingore);
 
-    // TODO后续继续看
+    // *这个地方是在点击了排序按钮之后触发的，默认排序是不会触发的
     if (!options || !(options.silent || options.init)) {
+      // *触发sort-change方法
       this.table.$emit('sort-change', {
         column,
         prop,

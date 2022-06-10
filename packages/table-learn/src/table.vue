@@ -216,6 +216,7 @@
         width: layout.scrollY ? layout.gutterWidth + 'px' : '0',
         height: layout.headerHeight + 'px'
       }"></div>
+    <!-- 这个是拖拽表格宽度过程中出现的那根垂直虚线，在拖拽宽度的时候会出现 -->
     <div class="el-table__column-resize-proxy" ref="resizeProxy" v-show="resizeProxyVisible"></div>
   </div>
 </template>
@@ -466,7 +467,7 @@
           this.doLayout();
         }
       },
-      // *
+      // *启动布局
       doLayout() {
         // *如果设置了高度、最大高度或者是有固定fixed的设置
         // *为什么加上了fixed，因为如果有fixed，则大概率就是需要水平滚动条的，所以需要留出滚动条的位置

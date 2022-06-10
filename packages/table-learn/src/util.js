@@ -28,7 +28,7 @@ export const orderBy = function(array, sortKey, reverse, sortMethod, sortBy) {
     // *-1表示降序，1表示升序
     reverse = reverse === 'descending' ? -1 : 1;
   } else {
-    // TODO还没有看到这种情况
+    // TODO还没有看到这种情况，可能是个null
     reverse = (reverse && reverse < 0) ? -1 : 1;
   }
   // *sortMthod表示排序方法，自定义排序，用法和Array.sort比较像
