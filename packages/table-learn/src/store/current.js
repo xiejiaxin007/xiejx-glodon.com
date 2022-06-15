@@ -34,6 +34,7 @@ export default {
       states.currentRow = currentRow;
     },
 
+    // *更新当前行
     updateCurrentRow(currentRow) {
       const { states, table } = this;
       const oldCurrentRow = states.currentRow;

@@ -259,17 +259,23 @@ export default {
     // *隐藏的情况应该是有固定列出现，用is-hidden类名来进行样式设定，那这个单元格就只是起到一个占位的作用，所以el-table有fixed的时候会多渲染好几个table标签
     isCellHidden(index, columns) {
       let start = 0;
-      // TODO干啥的，估计是因为如果有合并的，那index这个数量就不准确了，这里还需要计算未合并的个数
+      // TODO干啥的：估计是因为如果有合并的，那index这个数量就不准确了，这里还需要计算未合并的个数
       for (let i = 0; i < index; i++) {
         start += columns[i].colSpan;
       }
-      // !这里减1的原因？？
+      // !这里减1的原因：colspan默认就是1，这个地方计算是索引值，所以需要减1
       const after = start + columns[index].colSpan - 1;
+      // *fixed一般只会出现在有固定的情况下，目前我看最外层的本组件是没有fixed属性进行传入的
       if (this.fixed === true || this.fixed === 'left') {
         return after >= this.leftFixedLeafCount;
       } else if (this.fixed === 'right') {
         return start < this.columnsCount - this.rightFixedLeafCount;
       } else {
+        // *专属于最外层的header组件，固定表格里面的header都是写死了fixed属性的！
+        // !看起来像是，如果当前单元格在左固定的左边，则有is-hidden这个属性，如果在右固定的右边，则也有is-hidden这个属性，大概就是固定的那一列，应该在最上层，没有is-hidden属性
+        // *这个地方是索引和数量做对比，左侧固定规则：索引小于固定数目则表示需要隐藏，使用固定列的单元格
+        // *右侧固定规则：start取的就是当前索引值
+        // TODO有机会再看看：start和after的关系
         return (after < this.leftFixedLeafCount) || (start >= this.columnsCount - this.rightFixedLeafCount);
       }
     },
@@ -278,11 +284,12 @@ export default {
       const classes = [column.id, column.order, column.headerAlign, column.className, column.labelClassName];
 
       // *如果是第一行表头并且
-      // TODO为啥一定是第一行，我看html结构还真是没有is-hidden，我看就算所有都没有is-hidden似乎也没问题
+      // !为啥一定是第一行，我看html结构还真是没有is-hidden，我看就算所有都没有is-hidden似乎也没问题：fixed只作用于第一级header，合并的子header设置了fixed属性无用
       if (rowIndex === 0 && this.isCellHidden(columnIndex, row)) {
         classes.push('is-hidden');
       }
 
+      // *没有children，所以是is-leaf，表示叶子节点
       if (!column.children) {
         classes.push('is-leaf');
       }
@@ -357,6 +364,7 @@ export default {
         // *有筛选但是没有排序的情况
         this.handleFilterClick(event, column);
       }
+      // *如果同时配置筛选和过滤，则不会有其他操作
 
       this.$parent.$emit('header-click', column, event);
     },

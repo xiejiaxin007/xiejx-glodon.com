@@ -3,7 +3,7 @@ import { mergeOptions, parseWidth, parseMinWidth, compose } from './util';
 import ElCheckbox from 'element-ui/packages/checkbox';
 
 let columnIdSeed = 1;
-
+// *column是一个列数据，不是一个行数据，描述整个列的一些属性
 export default {
   name: 'ElTableColumn',
 
@@ -327,6 +327,7 @@ export default {
     // *找出的当前的column在整个表格中的索引
     const columnIndex = this.getColumnElIndex(children, this.$el);
 
+    // *如果当前是嵌套的column，则会把父级传入给insertColumn方法
     owner.store.commit('insertColumn', this.columnConfig, columnIndex, this.isSubColumn ? parent.columnConfig : null);
   },
 

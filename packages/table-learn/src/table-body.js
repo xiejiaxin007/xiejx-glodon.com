@@ -163,10 +163,12 @@ export default {
 
     getRowClass(row, rowIndex) {
       const classes = ['el-table__row'];
+      // *当前行高亮配置
       if (this.table.highlightCurrentRow && row === this.store.states.currentRow) {
         classes.push('current-row');
       }
 
+      // *斑马纹
       if (this.stripe && rowIndex % 2 === 1) {
         classes.push('el-table__row--striped');
       }
@@ -223,10 +225,13 @@ export default {
     },
 
     getColspanRealWidth(columns, colspan, index) {
+      // *按道理这个地方应该是不会触发的，因为如果colspan=0，则不需要渲染当前的td
       if (colspan < 1) {
         return columns[index].realWidth;
       }
+      // *获取当前索引下的column以及colspan大小加到一起的宽度
       const widthArr = columns.map(({ realWidth }) => realWidth).slice(index, index + colspan);
+      // TODO为什么从-1开始计算？？
       return widthArr.reduce((acc, width) => acc + width, -1);
     },
 
@@ -242,14 +247,20 @@ export default {
 
       // 判断是否text-overflow, 如果是就显示tooltip
       const cellChild = event.target.querySelector('.cell');
+      // *如果有el-tooltip类名，并且这个cell里头有内容，则才可能往下走
       if (!(hasClass(cellChild, 'el-tooltip') && cellChild.childNodes.length)) {
         return;
       }
       // use range width instead of scrollWidth to determine whether the text is overflowing
       // to address a potential FireFox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1074543#c3
+      // TODO这部分代码干啥的？
       const range = document.createRange();
       range.setStart(cellChild, 0);
       range.setEnd(cellChild, cellChild.childNodes.length);
+      // const seles = window.getSelection();
+      // seles.removeAllRanges();
+      // seles.addRange(range);
+
       const rangeWidth = range.getBoundingClientRect().width;
       const padding = (parseInt(getStyle(cellChild, 'paddingLeft'), 10) || 0) +
         (parseInt(getStyle(cellChild, 'paddingRight'), 10) || 0);
@@ -278,10 +289,12 @@ export default {
       this.table.$emit('cell-mouse-leave', oldHoverState.row, oldHoverState.column, oldHoverState.cell, event);
     },
 
+    // *鼠标进入触发事件，设置state的hoverRow为当前的index
     handleMouseEnter: debounce(30, function(index) {
       this.store.commit('setHoverRow', index);
     }),
 
+    // *鼠标离开触发事件，设置state的hoverRow为null
     handleMouseLeave: debounce(30, function() {
       this.store.commit('setHoverRow', null);
     }),
@@ -295,12 +308,15 @@ export default {
     },
 
     handleClick(event, row) {
+      // *更新当前行，并且暴露给使用者
       this.store.commit('setCurrentRow', row);
       this.handleEvent(event, row, 'click');
     },
 
+    // *点击事件（包括了点击单元格和点击某一行）
     handleEvent(event, row, name) {
       const table = this.table;
+      // *查找td标签
       const cell = getCell(event);
       let column;
       if (cell) {
@@ -313,10 +329,14 @@ export default {
     },
 
     rowRender(row, $index, treeRowData) {
+      // *firstDefaultColumnIndex是第一个属性是default的column索引
       const { treeIndent, columns, firstDefaultColumnIndex } = this;
+      // *样式为隐藏的column
       const columnsHidden = columns.map((column, index) => this.isColumnHidden(index));
+      // *配置行样式
       const rowClasses = this.getRowClass(row, $index);
       let display = true;
+      // TODO暂时没触发
       if (treeRowData) {
         rowClasses.push('el-table__row--level-' + treeRowData.level);
         display = treeRowData.display;
@@ -337,19 +357,26 @@ export default {
         on-mouseleave={ this.handleMouseLeave }>
         {
           columns.map((column, cellIndex) => {
+            // *tbody也可能有合并，通过span-method属性进行配置
             const { rowspan, colspan } = this.getSpan(row, column, $index, cellIndex);
+            // *如果有合并，肯定就会出现rowspan或者是colspan为0的情况，表示不需要进行td标签的渲染
             if (!rowspan || !colspan) {
               return null;
             }
+            // *这只是一个浅拷贝
             const columnData = { ...column };
+            // *计算当前td的真正宽度
             columnData.realWidth = this.getColspanRealWidth(columns, colspan, cellIndex);
+            // *这个地方context用户没有使用到
             const data = {
               store: this.store,
+              // TODO$vnode未找到具体是什么，目前只能猜测是table的虚拟dom
               _self: this.context || this.table.$vnode.context,
               column: columnData,
               row,
               $index
             };
+            // *如果是一行的第一个单元格，并且是树型结构的
             if (cellIndex === firstDefaultColumnIndex && treeRowData) {
               data.treeNode = {
                 indent: treeRowData.level * treeIndent,
@@ -393,6 +420,7 @@ export default {
       const store = this.store;
       const { isRowExpanded, assertRowKey } = store;
       const { treeData, lazyTreeNodeMap, childrenColumnName, rowKey } = store.states;
+      // *扩展的情况
       if (this.hasExpandColumn && isRowExpanded(row)) {
         const renderExpanded = this.table.renderExpanded;
         const tr = this.rowRender(row, $index);
@@ -409,6 +437,7 @@ export default {
             </td>
           </tr>]];
       } else if (Object.keys(treeData).length) {
+        // *树型情况
         assertRowKey();
         // TreeTable 时，rowKey 必须由用户设定，不使用 getKeyOfRow 计算
         // 在调用 rowRender 函数时，仍然会计算 rowKey，不太好的操作
@@ -476,6 +505,7 @@ export default {
         }
         return tmp;
       } else {
+        // *最简单的render
         return this.rowRender(row, $index);
       }
     }

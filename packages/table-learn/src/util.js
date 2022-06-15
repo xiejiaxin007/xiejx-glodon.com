@@ -1,8 +1,10 @@
 import { getValueByPath } from 'element-ui/src/utils/util';
 
+// *获取当前点击的单元格
 export const getCell = function(event) {
   let cell = event.target;
 
+  // *一直向上查找到HTML标签为止
   while (cell && cell.tagName.toUpperCase() !== 'HTML') {
     if (cell.tagName.toUpperCase() === 'TD') {
       return cell;
@@ -115,6 +117,7 @@ export const getColumnByKey = function(table, columnKey) {
   return column;
 };
 
+// *通过cell来找column
 export const getColumnByCell = function(table, cell) {
   const matches = (cell.className || '').match(/el-table_[^\s]+/gm);
   if (matches) {
@@ -126,6 +129,7 @@ export const getColumnByCell = function(table, cell) {
 export const getRowIdentity = (row, rowKey) => {
   if (!row) throw new Error('row is required when get row identity');
   if (typeof rowKey === 'string') {
+    // *row-key可能是是多层级，比如user.id、user.info.id，也可以是function
     if (rowKey.indexOf('.') < 0) {
       return row[rowKey];
     }

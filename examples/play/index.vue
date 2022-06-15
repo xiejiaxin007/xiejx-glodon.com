@@ -18,8 +18,7 @@
     :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
       <el-table-column
         type="index"
-        width="100"
-        fixed>
+        width="100">
         <!-- TODO 这个地方需要注意，估计是scope里面的store数据量太大了，导致页面死循环了 -->
         <template slot="header" slot-scope="scope">
           <span style="display:inline-block;width:50px"><i>这是一个自定义表头</i></span>
@@ -28,11 +27,14 @@
       <!-- <el-table-column
         type="selection">
       </el-table-column> -->
-      <!-- <el-table-column
+      <el-table-column
         label="测试左固定"
         fixed
-        prop="province">
-      </el-table-column> -->
+        prop="date" show-overflow-tooltip width="50">
+        <template slot-scope="scope">
+          <span style="display:inline-block;width:50px"><i>测试tooltip的代码是啥样的</i></span>
+        </template>
+      </el-table-column>
       <el-table-column label="个性特点">
         <el-table-column label="性别" prop="sex" :filter-method="dataFilter" width="200" :filters="filters" :filtered-value="['2']" filter-placement="top-start">
           <template slot-scope="scope">
@@ -175,6 +177,31 @@
     },
     mounted() {},
     methods: {
+      arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+        if (rowIndex % 2 === 0) {
+          if (columnIndex === 0) {
+            return [1, 2];
+          } else if (columnIndex === 1) {
+            return [0, 0];
+          }
+        }
+      },
+
+      objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+        if (columnIndex === 0) {
+          if (rowIndex % 2 === 0) {
+            return {
+              rowspan: 2,
+              colspan: 1
+            };
+          } else {
+            return {
+              rowspan: 0,
+              colspan: 0
+            };
+          }
+        }
+      },
       headerClickTest() {
         console.log(111);
       },
