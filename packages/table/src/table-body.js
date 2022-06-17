@@ -375,6 +375,7 @@ export default {
                 on-mouseenter={ ($event) => this.handleCellMouseEnter($event, row) }
                 on-mouseleave={ this.handleCellMouseLeave }>
                 {
+                  // TODO _renderProxy属于vue源码中的，不太清楚具体的逻辑，反正是改变上下文的
                   column.renderCell.call(
                     this._renderProxy,
                     this.$createElement,

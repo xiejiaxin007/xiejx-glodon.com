@@ -21,7 +21,7 @@
         width="100">
         <!-- TODO 这个地方需要注意，估计是scope里面的store数据量太大了，导致页面死循环了 -->
         <template slot="header" slot-scope="scope">
-          <span style="display:inline-block;width:50px"><i>这是一个自定义表头</i></span>
+          <span style="display:inline-block;width:50px;overflow:hidden"><i>这是一个自定义表头</i></span>
         </template>
       </el-table-column>
       <!-- <el-table-column
@@ -30,9 +30,9 @@
       <el-table-column
         label="测试左固定"
         fixed
-        prop="date" show-overflow-tooltip width="50">
+        prop="date" show-overflow-tooltip width="80">
         <template slot-scope="scope">
-          <span style="display:inline-block;width:50px"><i>测试tooltip的代码是啥样的</i></span>
+          <span style="display:inline-block;width:50px"><i>测试tooltip的代码是啥样的ceshiceshi</i></span>
         </template>
       </el-table-column>
       <el-table-column label="个性特点">

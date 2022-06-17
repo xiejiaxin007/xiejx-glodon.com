@@ -255,18 +255,24 @@ export default {
       // to address a potential FireFox bug: https://bugzilla.mozilla.org/show_bug.cgi?id=1074543#c3
       // TODO这部分代码干啥的？
       const range = document.createRange();
+      // !需要注意的是，设置range的时候第一个参数（dom节点）使用的是cellChild，也就是cell这个单元格，所以以下做法是会选中当前tooltip文本那部分，如果使用cellChild.firstChild的话就不一样了，这个表示dom是text节点，则选中是文本的索引值进行选中的
+      // ?参考分析文章：https://note.youdao.com/s/QXi2UYKM
       range.setStart(cellChild, 0);
       range.setEnd(cellChild, cellChild.childNodes.length);
+      // !运行以下代码可以看到上面代码的效果：会有选中效果，但是源码中没有以下代码，这是我自己添加的
       // const seles = window.getSelection();
       // seles.removeAllRanges();
       // seles.addRange(range);
 
+      // *这个地方获取的是range所占的宽度，不管我们单元格的宽度是多少（宽度可能很小），它只是表示range内容的宽度
       const rangeWidth = range.getBoundingClientRect().width;
       const padding = (parseInt(getStyle(cellChild, 'paddingLeft'), 10) || 0) +
         (parseInt(getStyle(cellChild, 'paddingRight'), 10) || 0);
+        // *第一种情况：range内容+padding如果大于了offsetWidth且设置了tooltip属性，则需要有tooltip
+        // TODO第二种情况：cellChild出现滚动条，这个目前不知道怎么触发
       if ((rangeWidth + padding > cellChild.offsetWidth || cellChild.scrollWidth > cellChild.offsetWidth) && this.$refs.tooltip) {
         const tooltip = this.$refs.tooltip;
-        // TODO 会引起整个 Table 的重新渲染，需要优化
+        // TODO 会引起整个 Table 的重新渲染，需要优化（原作者）
         this.tooltipContent = cell.innerText || cell.textContent;
         tooltip.referenceElm = cell;
         tooltip.$refs.popper && (tooltip.$refs.popper.style.display = 'none');
